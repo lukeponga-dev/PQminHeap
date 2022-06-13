@@ -1,144 +1,141 @@
-// Implementing "Min Heap"
-public class PriorityQueue {
-    // Create a complete binary tree using an array
-    // Then use the binary tree to construct a Heap
-    int[] minHeap;
-    // the number of elements is needed when instantiating an array
-    // heapSize records the size of the array
-    int heapSize;
-    // realSize records the number of elements in the Heap
-    int realSize = 0;
+import java.util.Arrays;
 
-    public PriorityQueue(int heapSize) {
-        this.heapSize = heapSize;
-        minHeap = new int[heapSize + 1];
-        // To better track the indices of the binary tree,
-        // we will not use the 0-th element in the array
-        // You can fill it with any value
-        minHeap[0] = 0;
+/**
+ * {@index PriorityQueue Implements a Priority Queue using an arrary of nodes,}
+ * sorted with minheap
+ *
+ * {@author Luke Ponga}
+ */
+public class PriorityQueue {
+
+    // Constructor //
+    Node[] minHeap;
+
+    int next = 0;
+
+    public PriorityQueue(int capacity) {
+        minHeap = new Node[capacity + 1];
+        next = 1;
     }
 
-    // Function to add an element
-    public void add(int element) {
-        realSize++;
-        // If the number of elements in the Heap exceeds the preset heapSize
-        // print "Added too many elements" and return
-        if (realSize > heapSize) {
-            System.out.println("Added too many elements!");
-            realSize--;
+    // Methods //
+
+    /**
+     * method insert
+     *
+     * {@param n}, the node into priority queue
+     */
+    public void insert(Node n) {
+        minHeap[next] = n;
+        upheap(next);
+        next++;
+    }
+
+    /**
+     * method delete
+     *
+     * renoves highest priority node
+     */
+    public void delete() {
+        // set root to 1
+        int root = 1;
+        int lastLeft = next - 1;
+
+        // Check if heap is empty
+        if (next == 1) {
             return;
         }
-        // Add the element into the array
-        minHeap[realSize] = element;
-        // Index of the newly added element
-        int index = realSize;
-        // Parent node of the newly added element
-        // Note if we use an array to represent the complete binary tree
-        // and store the root node at index 1
-        // index of the parent node of any node is [index of the node / 2]
-        // index of the left child node is [index of the node * 2]
-        // index of the right child node is [index of the node * 2 + 1]
-        int parent = index / 2;
-        // If the newly added element is smaller than its parent node,
-        // its value will be exchanged with that of the parent node
-        while (minHeap[index] < minHeap[parent] && index > 1) {
-            int temp = minHeap[index];
-            minHeap[index] = minHeap[parent];
-            minHeap[parent] = temp;
-            index = parent;
-            parent = index / 2;
-        }
-    }
-
-    // Get the top element of the Heap
-    public int peek() {
-        return minHeap[1];
-    }
-
-    // Delete the top element of the Heap
-    public int pop() {
-        // If the number of elements in the current Heap is 0,
-        // print "Don't have any elements" and return a default value
-        if (realSize < 1) {
-            System.out.println("Don't have any element!");
-            return Integer.MAX_VALUE;
+        // If root is last leaf delete it
+        if (root == lastLeft) {
+            minHeap[lastLeft].minHeap = 0;
+            next--;
         } else {
-            // When there are still elements in the Heap
-            // realSize >= 1
-            int removeElement = minHeap[1];
-            // Put the last element in the Heap to the top of Heap
-            minHeap[1] = minHeap[realSize];
-            realSize--;
-            int index = 1;
-            // When the deleted element is not a leaf node
-            while (index <= realSize / 2) {
-                // the left child of the deleted element
-                int left = index * 2;
-                // the right child of the deleted element
-                int right = (index * 2) + 1;
-                // If the deleted element is larger than the left or right child
-                // its value needs to be exchanged with the smaller value
-                // of the left and right child
-                if (minHeap[index] > minHeap[left] || minHeap[index] > minHeap[right]) {
-                    if (minHeap[left] < minHeap[right]) {
-                        int temp = minHeap[left];
-                        minHeap[left] = minHeap[index];
-                        minHeap[index] = temp;
-                        index = left;
-                    } else {
-                        // maxHeap[left] >= maxHeap[right]
-                        int temp = minHeap[right];
-                        minHeap[right] = minHeap[index];
-                        minHeap[index] = temp;
-                        index = right;
-                    }
-                } else {
-                    break;
-                }
+            swap(root, lastLeft);
+            minHeap[lastLeft].minHeap = 0;
+            next--;
+        }
+        downHeap();
+    }
+
+    // private methods
+
+    /**
+     * method swap
+     * swaps pos1 and pos2 without overwritting them
+     * by creating temp variable
+     * 
+     * @param pos1
+     * @param pos2
+     */
+    private void swap(int pos1, int pos2) {
+        // Store value of position one
+        Node temp = minHeap[pos1];
+
+        // Set value of position one to equal position 2
+        minHeap[pos1] = minHeap[pos2];
+
+        // Set value of position two to equal temp
+        minHeap[pos2] = temp;
+    }
+
+    /**
+     * method upheap
+     * {@summary Sorts priority queue - minheap }
+     *
+     * @param pos
+     */
+    private void upheap(int pos) {
+        // Set child to current node
+        int child = pos;
+
+        // While child node is greater than 1
+        while (child > 1) {
+            int parent = child / 2;
+
+            // If childs value is less than parents value
+            if (minHeap[child].minHeap < minHeap[parent].minHeap) {
+                // Swap child and parent values,
+                swap(child, parent);
             }
-            return removeElement;
+            child = parent;
         }
     }
 
-    // return the number of elements in the Heap
-    public int size() {
-        return realSize;
-    }
+    /**
+     * method downHeap
+     *
+     */
+    private void downHeap() {
+        int smallest = -1;
+        int parent = 1;
+        while (parent < next) {
+            int left = parent * 2;
+            int right = parent * 2 + 1;
 
-    public String toString() {
-        if (realSize == 0) {
-            return "No element!";
-        } else {
-            StringBuilder sb = new StringBuilder();
-            sb.append('[');
-            for (int i = 1; i <= realSize; i++) {
-                sb.append(minHeap[i]);
-                sb.append(',');
+            if (left < next && minHeap[left].minHeap < minHeap[parent].minHeap) {
+                smallest = left;
             }
-            sb.deleteCharAt(sb.length() - 1);
-            sb.append(']');
-            return sb.toString();
+
+            if (right < next && minHeap[right].minHeap < minHeap[smallest].minHeap) {
+                smallest = right;
+            }
+
+            if (parent != smallest) {
+                swap(smallest, parent);
+                parent = smallest;
+            } else {
+                // exit loop
+                break;
+            }
         }
     }
 
-    public static void main(String[] args) {
-        // Test case
-        PriorityQueue minHeap = new PriorityQueue(3);
-        minHeap.add(3);
-        minHeap.add(1);
-        minHeap.add(2);
-        // [1,3,2]
-        System.out.println(minHeap.toString());
-        // 1
-        System.out.println(minHeap.peek());
-        // 1
-        System.out.println(minHeap.pop());
-        // [2, 3]
-        System.out.println(minHeap.toString());
-        minHeap.add(4);
-        // Add too many elements
-        minHeap.add(5);
-        // [2,3,4]
-        System.out.println(minHeap.toString());
+    /**
+     * method dump
+     *
+     * prints the minheap the console
+     */
+    public void dump() {
+        System.out.println("Priority: " + Arrays.toString(minHeap));
     }
 }

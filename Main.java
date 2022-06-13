@@ -9,11 +9,9 @@ public class Main {
         priorityQueue.insert(new Node(4));
         priorityQueue.insert(new Node(3));
 
-        // Print pri
         System.out.println();
         priorityQueue.dump();
-
-        priorityQueue.delete();
+        System.out.println(priorityQueue.delete());
         priorityQueue.dump();
     }
 }

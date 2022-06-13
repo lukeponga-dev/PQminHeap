@@ -36,14 +36,13 @@ public class PriorityQueue {
      *
      * renoves highest priority node
      */
-    public void delete() {
+    public Node delete() {
         // set root to 1
         int root = 1;
         int lastLeft = next - 1;
-
         // Check if heap is empty
         if (next == 1) {
-            return;
+            return peek();
         }
         // If root is last leaf delete it
         if (root == lastLeft) {
@@ -54,10 +53,16 @@ public class PriorityQueue {
             minHeap[lastLeft].minHeap = 0;
             next--;
         }
+
         downHeap();
+        return peek();
     }
 
-    // private methods
+    private Node peek() {
+        return minHeap[1];
+    }
+
+    // Helper methods //
 
     /**
      * method swap
@@ -103,6 +108,8 @@ public class PriorityQueue {
 
     /**
      * method downHeap
+     * 
+     * @return
      *
      */
     private void downHeap() {
@@ -127,6 +134,7 @@ public class PriorityQueue {
                 // exit loop
                 break;
             }
+
         }
     }
 
